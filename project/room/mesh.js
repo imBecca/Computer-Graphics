@@ -63,28 +63,29 @@ class Mesh {
 
     
     render(gl, programInfo, uniforms){
-        if (!this.ready) return;    // waiting for async functions to complete
+   
+            if (!this.ready) return;    // waiting for async functions to complete
 
-        gl.useProgram(programInfo.program);
-        webglUtils.setUniforms(programInfo, uniforms);     // calls gl.uniform
-
-        // compute the world matrix
-        let u_world = m4.identity()
-
-        if (this.rotate === true && uniforms.u_textureMatrix !== m4.identity() ){
-            u_world = m4.yRotate(u_world, degToRad(this.angle));
-            this.angle = this.angle === 360? 0 : this.angle+5;
+            gl.useProgram(programInfo.program);
+            webglUtils.setUniforms(programInfo, uniforms);     // calls gl.uniform
+    
+            // compute the world matrix
+            let u_world = m4.identity()
+    
+            if (this.rotate === true && uniforms.u_textureMatrix !== m4.identity() ){
+                u_world = m4.yRotate(u_world, degToRad(this.angle));
+                this.angle = this.angle === 360? 0 : this.angle+5;
+            }
+    
+            for (const {bufferInfo, material} of this.obj.parts) {
+                // calls gl.bindBuffer, gl.enableVertexAttribArray, gl.vertexAttribPointer
+                webglUtils.setBuffersAndAttributes(gl, programInfo, bufferInfo);
+                // calls gl.uniform
+                webglUtils.setUniforms(programInfo, {
+                    u_world,
+                }, material);
+                // calls gl.drawArrays or gl.drawElements
+                webglUtils.drawBufferInfo(gl, bufferInfo);
+            }
         }
-
-        for (const {bufferInfo, material} of this.obj.parts) {
-            // calls gl.bindBuffer, gl.enableVertexAttribArray, gl.vertexAttribPointer
-            webglUtils.setBuffersAndAttributes(gl, programInfo, bufferInfo);
-            // calls gl.uniform
-            webglUtils.setUniforms(programInfo, {
-                u_world,
-            }, material);
-            // calls gl.drawArrays or gl.drawElements
-            webglUtils.drawBufferInfo(gl, bufferInfo);
-        }
-    }
 }

@@ -11,6 +11,7 @@ function render() {
     let proj = scene.projectionMatrix()
 
     if(scene.shadows.enable){
+        
         const lightWorldMatrix = m4.lookAt(
             light.position,       // position
             light.direction.map(l =>  -l),      // target
